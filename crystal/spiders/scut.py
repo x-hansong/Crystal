@@ -17,7 +17,8 @@ class ScutSpider(Spider):
         self.driver.close()
 
     def parse(self, response):
-        urls = getUrlList(response)
+        urls = self.getUrlList(response)
+
 
         
     def getUrlList(self, response):
