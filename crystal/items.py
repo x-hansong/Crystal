@@ -13,4 +13,8 @@ class CrystalItem(scrapy.Item):
     # name = scrapy.Field()
     title = scrapy.Field()
     url = scrapy.Field()
-    pass
+    college = scrapy.Field()
+    speaker = scrapy.Field()
+    venue = scrapy.Field()
+    time = scrapy.Field()
+    notify_time = scrapy.Field()

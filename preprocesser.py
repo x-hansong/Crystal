@@ -2,19 +2,31 @@
 # coding=utf-8
 
 from selenium import webdriver
+import sys
 
 class UrlPreprocesser():
 
     """Use webdriver to get all lists of url needed"""
 
-    def __init__(self, start_url, word = None):
-        self.start_url = start_url
-        self.word = word
+    def __init__(self):
+        self.start_url = None
+        self.url_xpath = None
+        self.word = None
         self.titles_urls = {}
         self.driver = webdriver.PhantomJS()
 
-#    def __del__(self):
-        #self.driver.close()
+    def __del__(self):
+        self.driver.close()
+
+    def set_start_url(self, start_url):
+        self.start_url = start_url
+
+    def set_word(self, word):
+        '''set word to match'''
+        self.word = word
+
+    def set_url_xpath(self, url_xpath):
+        self.url_xpath = url_xpath
 
     def get_filted_urls(self):
         self.get_all_urls()
@@ -45,18 +57,22 @@ class UrlPreprocesser():
         :returns: the list of all url needed
 
         """
+        if self.start_url == None:
+            print 'please set_start_url first'
+            sys.exit()
         self.driver.get(self.start_url)
         self.parse_url()
         while self.nextpage(self.driver.page_source):
             self.parse_url()
 
     def parse_url(self):
-        elements = self.driver.find_elements_by_xpath("//a[@style]")  
+        if self.url_xpath == None:
+            print 'please set_url_xpath first'
+            sys.exit()
+        elements = self.driver.find_elements_by_xpath(self.url_xpath)  
         for element in elements:
             self.titles_urls[element.text] = element.get_attribute('href')
-            print element.text.encode('utf8')
 
-        
             
     def nextpage(self, pre_page):
         """use webdriver to access the link of nextpage which may be a javascript function
@@ -65,8 +81,8 @@ class UrlPreprocesser():
                   False if has not nextpage
 
         """
-        nextpage = self.driver.find_element_by_link_text("下一页")
         try:
+            nextpage = self.driver.find_element_by_link_text("下一页")
             nextpage.click()
             #if  the nextpage is the same as pre_page, then it's no more page
             if self.driver.page_source == pre_page:
