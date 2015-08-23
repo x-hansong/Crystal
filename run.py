@@ -19,12 +19,13 @@ runner = CrawlerRunner()
 
 seeds = db.query(Seed)
 urlPreprocesser = UrlPreprocesser()
+urls = []
 for seed in seeds:
     set_trace()
     urlPreprocesser.set_start_url(seed.start_url)
     urlPreprocesser.set_url_xpath(seed.url_xpath)
     urlPreprocesser.set_word(seed.word)
-    urls = urlPreprocesser.get_filted_urls()
+    urls.extend(urlPreprocesser.get_filted_urls())
 
 #@defer.inlineCallbacks
 #def crawl():
