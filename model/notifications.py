@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-from sqlalchemy import Column, String ,  DATETIME
+from sqlalchemy import Column, String, DATE, DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -17,6 +17,6 @@ class Notification(Base):
     speaker = Column(String)
     venue = Column(String)
     time = Column(DATETIME)
-    notify_time = Column(DATETIME)
+    notify_time = Column(DATE)
 
         
