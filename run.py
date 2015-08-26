@@ -1,36 +1,39 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from crystal.spiders.scut import ScutSpider
+from crystal.spiders.spider import CommonSpider
 from preprocesser import UrlPreprocesser
 # scrapy api
-from twisted.internet import reactor, defer
-from scrapy.crawler import CrawlerRunner
-from scrapy.utils.log import configure_logging
+from scrapy.settings import Settings
+from scrapy.crawler import CrawlerProcess
 #debug
-from pudb import set_trace
+from pdb import set_trace
 #model
 from model.db_config import DBSession
 from model.seeds import Seed
 
+settings = Settings()
+
+# crawl settings
+settings.set("USER_AGENT", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36")
+#settings.set("ITEM_PIPELINES" , {
+    #'pipelines.DuplicatesPipeline': 200,
+    ## 'pipelines.CountDropPipline': 100,
+    #'pipelines.DataBasePipeline': 300,
+#})
+
+process = CrawlerProcess(settings)
 db = DBSession()
-configure_logging()
-runner = CrawlerRunner()
 
 seeds = db.query(Seed)
 urlPreprocesser = UrlPreprocesser()
-urls = []
 for seed in seeds:
-    set_trace()
+#    set_trace()
     urlPreprocesser.set_start_url(seed.start_url)
     urlPreprocesser.set_url_xpath(seed.url_xpath)
     urlPreprocesser.set_word(seed.word)
-    urls.extend(urlPreprocesser.get_filted_urls())
+    urls = urlPreprocesser.get_filted_urls()
+    process.crawl(CommonSpider, seed, urls)
+    process.start()
 
-#@defer.inlineCallbacks
-#def crawl():
-    #yield runner.crawl(ScutSpider)
-    #reactor.stop()
 
-#crawl()
-#reactor.run() # the script will block here until the last crawl call is finished

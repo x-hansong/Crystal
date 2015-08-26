@@ -14,5 +14,7 @@ class Seed(Base):
     college = Column(String)
     url_xpath = Column(String)
     word = Column(String)
-
-        
+    title = Column(String)
+    speaker = Column(String)
+    venue = Column(String)
+    time = Column(String) 
