@@ -18,3 +18,4 @@ class Seed(Base):
     speaker = Column(String)
     venue = Column(String)
     time = Column(String) 
+    text_xpath = Column(String)

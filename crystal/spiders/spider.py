@@ -21,7 +21,7 @@ class CommonSpider(Spider):
         notification = Notification()
         texts = []
         #get all the lines
-        lines = response.xpath(self.seed.url_xpath)
+        lines = response.xpath(self.seed.text_xpath)
         for line in lines:
             #the list of text
             ls = line.xpath('.//text()').extract()
@@ -34,17 +34,17 @@ class CommonSpider(Spider):
                 if v in text:
                     notification[k] = text
                     print text.encode('utf8')
-        set_trace()
+#        set_trace()
         #use re.match to parse the notify_time
         notification['notify_time'] = None
         for text in texts:
-            t = re.match('^(\d{4})年(\d+)月(\d+)日', text)
+            t = re.match(u'^(\d{4})年(\d+)月(\d+)日', text)
             if t is not None:
                  notification['notify_time'] = self.format_date(t)
         print notification['notify_time']
 
         #format notification time
-        tt = re.search('(\d{4})年(\d+)月(\d+)日.*?(\d+).(\d+)', notification['time'])
+        tt = re.search(u'(\d{4})年(\d+)月(\d+)日.*?(\d+).(\d+)', notification['time'])
         if tt is not None:
             notification['time'] = self.format_datetime(tt)
         print notification['time']
