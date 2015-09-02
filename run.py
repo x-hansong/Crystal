@@ -4,37 +4,36 @@
 from crystal.spiders.spider import CommonSpider
 from preprocesser import UrlPreprocesser
 # scrapy api
-from scrapy.settings import Settings
+from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerProcess
 #debug
-from pdb import set_trace
+from ipdb import set_trace
+import crash_on_ipy
 #model
 from model.db_config import DBSession
 from model.seeds import Seed
+from model.notifications import Notification
 
-settings = Settings()
 
-# crawl settings
-settings.set("USER_AGENT", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36")
-#settings.set("ITEM_PIPELINES" , {
-    #'pipelines.DuplicatesPipeline': 200,
-    ## 'pipelines.CountDropPipline': 100,
-    #'pipelines.DataBasePipeline': 300,
-#})
-
-process = CrawlerProcess(settings)
+process = CrawlerProcess(get_project_settings())
 db = DBSession()
 
 seeds = db.query(Seed)
 urlPreprocesser = UrlPreprocesser()
-urls = ['http://www2.scut.edu.cn/s/87/t/431/cb/4d/info117581.htm']
+
 for seed in seeds:
-#    set_trace()
+
+    urls = db.query(Notification.url).filter(Notification.college == seed.college).all()
+    existed_urls = []
+    for url in urls:
+        existed_urls.append(url[0])
+    #set_trace()
     urlPreprocesser.set_start_url(seed.start_url)
     urlPreprocesser.set_url_xpath(seed.url_xpath)
     urlPreprocesser.set_word(seed.word)
-#    urls = urlPreprocesser.get_filted_urls()
+    urlPreprocesser.set_existed_urls(existed_urls)
+    urls = urlPreprocesser.get_filted_urls()
+    #set_trace()
     process.crawl(CommonSpider, seed, urls)
-    process.start()
 
-
+process.start()

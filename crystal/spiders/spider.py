@@ -5,7 +5,8 @@ from scrapy.spiders import Spider
 from scrapy.selector import Selector
 from crystal.items import Notification
 #debug
-from pdb import set_trace
+from ipdb import set_trace
+import crash_on_ipy
 
 class CommonSpider(Spider):
     name = "common"
@@ -30,28 +31,30 @@ class CommonSpider(Spider):
         #parse the text to notification fields:title, speaker, venue, time
         for text in texts:
             print text.encode('utf8')
+            text = text.replace(u'\xa0', u' ')
             for (k, v) in self.words.items():
                 if v in text:
                     notification[k] = text
-                    print text.encode('utf8')
-#        set_trace()
+        #set_trace()
         #use re.match to parse the notify_time
-        notification['notify_time'] = None
         for text in texts:
             t = re.match(u'^(\d{4})年(\d+)月(\d+)日', text)
             if t is not None:
                  notification['notify_time'] = self.format_date(t)
-        print notification['notify_time']
 
         #format notification time
-        tt = re.search(u'(\d{4})年(\d+)月(\d+)日.*?(\d+).(\d+)', notification['time'])
+        tt = re.search(u'(\d{4})年(\d+)月(\d+)日.*?(\d+).+(\d+)', notification['time'])
         if tt is not None:
             notification['time'] = self.format_datetime(tt)
-        print notification['time']
 
+        #set college and url
+        notification['college'] = self.seed.college
+        notification['url'] = response.url
                     
-        for (k, v) in self.words.items():
-            print notification[k].encode('utf8')
+#        for (k, v) in self.words.items():
+            #print notification[k].encode('utf8')
+
+        return notification
 
     def format_date(self, t):
         y = t.group(1)
