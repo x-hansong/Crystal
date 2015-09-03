@@ -14,19 +14,23 @@ from model.db_config import DBSession
 from model.seeds import Seed
 from model.notifications import Notification
 
-
+#use settings.py
 process = CrawlerProcess(get_project_settings())
+
 db = DBSession()
 
 seeds = db.query(Seed)
 urlPreprocesser = UrlPreprocesser()
 
-for seed in seeds:
-
+def get_existed_urls(seed):
     urls = db.query(Notification.url).filter(Notification.college == seed.college).all()
     existed_urls = []
     for url in urls:
         existed_urls.append(url[0])
+    return existed_urls
+
+for seed in seeds:
+    existed_urls = get_existed_urls(seed)
     #set_trace()
     urlPreprocesser.set_start_url(seed.start_url)
     urlPreprocesser.set_url_xpath(seed.url_xpath)
@@ -37,3 +41,5 @@ for seed in seeds:
     process.crawl(CommonSpider, seed, urls)
 
 process.start()
+
+

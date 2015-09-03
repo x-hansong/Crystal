@@ -100,7 +100,7 @@ class UrlPreprocesser():
             nextpage.click()
             #if  the nextpage is the same as pre_page, then it's no more page 
             # crawl 10 pages at most
-            if self.driver.page_source == pre_page or self.times < 10:
+            if self.driver.page_source == pre_page or self.times > 10:
                 return False
             else:
                 self.times += 1
